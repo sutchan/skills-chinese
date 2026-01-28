@@ -5,3 +5,4 @@ __pycache__/
 
 test/
 .trae/
+test/translation_tracking.csv

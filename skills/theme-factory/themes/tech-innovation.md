@@ -1,19 +1,19 @@
-# Tech Innovation
+# 技术创新
 
-A bold and modern theme with high-contrast colors perfect for cutting-edge technology presentations.
+一个大胆现代的主题，以高对比度颜色为特色，非常适合前沿技术演示文稿。
 
-## Color Palette
+## 调色板
 
-- **Electric Blue**: `#0066ff` - Vibrant primary accent
-- **Neon Cyan**: `#00ffff` - Bright highlight color
-- **Dark Gray**: `#1e1e1e` - Deep backgrounds
-- **White**: `#ffffff` - Clean text and contrast
+- **电蓝色**：`#0066ff` - 充满活力的主要强调色
+- **霓虹青色**：`#00ffff` - 明亮的高亮颜色
+- **深灰色**：`#1e1e1e` - 深色背景
+- **白色**：`#ffffff` - 干净的文本和对比
 
-## Typography
+## 排版
 
-- **Headers**: DejaVu Sans Bold
-- **Body Text**: DejaVu Sans
+- **标题**：DejaVu Sans Bold
+- **正文**：DejaVu Sans
 
-## Best Used For
+## 最佳用途
 
-Tech startups, software launches, innovation showcases, AI/ML presentations, digital transformation content.
+科技初创公司、软件发布、创新展示、AI/ML 演示文稿、数字化转型内容。
