@@ -300,9 +300,9 @@ SECRET LABS AB AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTW
 
 ---
 
-## **SIL Open Font License v1.1**
+## **SIL 开源字体许可证 v1.1**
 
-The following fonts are licensed under SIL Open Font License v1.1 reproduced below:
+以下字体在 SIL 开源字体许可证 v1.1 下获得许可，许可证文本如下：
 
 **Arsenal SC**, Copyright 2012 The Arsenal Project Authors ([andrij.design@gmail.com](mailto:andrij.design@gmail.com))
 
