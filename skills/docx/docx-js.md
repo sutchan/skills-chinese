@@ -1,12 +1,12 @@
-# DOCX Library Tutorial
+# DOCX 库教程
 
-Generate .docx files with JavaScript/TypeScript.
+使用 JavaScript/TypeScript 生成 .docx 文件。
 
-**Important: Read this entire document before starting.** Critical formatting rules and common pitfalls are covered throughout - skipping sections may result in corrupted files or rendering issues.
+**重要：开始之前请阅读整个文档。** 关键的格式规则和常见陷阱贯穿全文 - 跳过部分可能导致文件损坏或渲染问题。
 
-## Setup
-Assumes docx is already installed globally
-If not installed: `npm install -g docx`
+## 设置
+假设 docx 已经全局安装
+如果未安装：`npm install -g docx`
 
 ```javascript
 const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, Media, 
@@ -15,19 +15,19 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageR
         TabStopPosition, UnderlineType, ShadingType, VerticalAlign, SymbolRun, PageNumber,
         FootnoteReferenceRun, Footnote, PageBreak } = require('docx');
 
-// Create & Save
+// 创建 & 保存
 const doc = new Document({ sections: [{ children: [/* content */] }] });
 Packer.toBuffer(doc).then(buffer => fs.writeFileSync("doc.docx", buffer)); // Node.js
-Packer.toBlob(doc).then(blob => { /* download logic */ }); // Browser
+Packer.toBlob(doc).then(blob => { /* download logic */ }); // 浏览器
 ```
 
-## Text & Formatting
+## 文本 & 格式
 ```javascript
-// IMPORTANT: Never use \n for line breaks - always use separate Paragraph elements
-// ❌ WRONG: new TextRun("Line 1\nLine 2")
-// ✅ CORRECT: new Paragraph({ children: [new TextRun("Line 1")] }), new Paragraph({ children: [new TextRun("Line 2")] })
+// 重要：永远不要使用 \n 作为换行符 - 始终使用单独的 Paragraph 元素
+// ❌ 错误：new TextRun("Line 1\nLine 2")
+// ✅ 正确：new Paragraph({ children: [new TextRun("Line 1")] }), new Paragraph({ children: [new TextRun("Line 2")] })
 
-// Basic text with all formatting options
+// 带有所有格式选项的基本文本
 new Paragraph({
   alignment: AlignmentType.CENTER,
   spacing: { before: 200, after: 200 },
@@ -36,37 +36,37 @@ new Paragraph({
     new TextRun({ text: "Bold", bold: true }),
     new TextRun({ text: "Italic", italics: true }),
     new TextRun({ text: "Underlined", underline: { type: UnderlineType.DOUBLE, color: "FF0000" } }),
-    new TextRun({ text: "Colored", color: "FF0000", size: 28, font: "Arial" }), // Arial default
+    new TextRun({ text: "Colored", color: "FF0000", size: 28, font: "Arial" }), // 默认 Arial
     new TextRun({ text: "Highlighted", highlight: "yellow" }),
     new TextRun({ text: "Strikethrough", strike: true }),
     new TextRun({ text: "x2", superScript: true }),
     new TextRun({ text: "H2O", subScript: true }),
     new TextRun({ text: "SMALL CAPS", smallCaps: true }),
-    new SymbolRun({ char: "2022", font: "Symbol" }), // Bullet •
-    new SymbolRun({ char: "00A9", font: "Arial" })   // Copyright © - Arial for symbols
+    new SymbolRun({ char: "2022", font: "Symbol" }), // 项目符号 •
+    new SymbolRun({ char: "00A9", font: "Arial" })   // 版权 © - 符号使用 Arial
   ]
 })
 ```
 
-## Styles & Professional Formatting
+## 样式 & 专业格式
 
 ```javascript
 const doc = new Document({
   styles: {
-    default: { document: { run: { font: "Arial", size: 24 } } }, // 12pt default
+    default: { document: { run: { font: "Arial", size: 24 } } }, // 默认 12pt
     paragraphStyles: [
-      // Document title style - override built-in Title style
+      // 文档标题样式 - 覆盖内置 Title 样式
       { id: "Title", name: "Title", basedOn: "Normal",
         run: { size: 56, bold: true, color: "000000", font: "Arial" },
         paragraph: { spacing: { before: 240, after: 120 }, alignment: AlignmentType.CENTER } },
-      // IMPORTANT: Override built-in heading styles by using their exact IDs
+      // 重要：通过使用精确的 ID 覆盖内置标题样式
       { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
         run: { size: 32, bold: true, color: "000000", font: "Arial" }, // 16pt
-        paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 } }, // Required for TOC
+        paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 } }, // TOC 必需
       { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
         run: { size: 28, bold: true, color: "000000", font: "Arial" }, // 14pt
         paragraph: { spacing: { before: 180, after: 180 }, outlineLevel: 1 } },
-      // Custom styles use your own IDs
+      // 自定义样式使用您自己的 ID
       { id: "myStyle", name: "My Style", basedOn: "Normal",
         run: { size: 28, bold: true, color: "000000" },
         paragraph: { spacing: { after: 120 }, alignment: AlignmentType.CENTER } }
@@ -77,8 +77,8 @@ const doc = new Document({
   sections: [{
     properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } } },
     children: [
-      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("Document Title")] }), // Uses overridden Title style
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Heading 1")] }), // Uses overridden Heading1 style
+      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("Document Title")] }), // 使用覆盖的 Title 样式
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Heading 1")] }), // 使用覆盖的 Heading1 样式
       new Paragraph({ style: "myStyle", children: [new TextRun("Custom paragraph style")] }),
       new Paragraph({ children: [
         new TextRun("Normal with "),
@@ -89,27 +89,27 @@ const doc = new Document({
 });
 ```
 
-**Professional Font Combinations:**
-- **Arial (Headers) + Arial (Body)** - Most universally supported, clean and professional
-- **Times New Roman (Headers) + Arial (Body)** - Classic serif headers with modern sans-serif body
-- **Georgia (Headers) + Verdana (Body)** - Optimized for screen reading, elegant contrast
+**专业字体组合：**
+- **Arial (标题) + Arial (正文)** - 最普遍支持，干净专业
+- **Times New Roman (标题) + Arial (正文)** - 经典衬线标题与现代无衬线正文
+- **Georgia (标题) + Verdana (正文)** - 针对屏幕阅读优化，优雅对比
 
-**Key Styling Principles:**
-- **Override built-in styles**: Use exact IDs like "Heading1", "Heading2", "Heading3" to override Word's built-in heading styles
-- **HeadingLevel constants**: `HeadingLevel.HEADING_1` uses "Heading1" style, `HeadingLevel.HEADING_2` uses "Heading2" style, etc.
-- **Include outlineLevel**: Set `outlineLevel: 0` for H1, `outlineLevel: 1` for H2, etc. to ensure TOC works correctly
-- **Use custom styles** instead of inline formatting for consistency
-- **Set a default font** using `styles.default.document.run.font` - Arial is universally supported
-- **Establish visual hierarchy** with different font sizes (titles > headers > body)
-- **Add proper spacing** with `before` and `after` paragraph spacing
-- **Use colors sparingly**: Default to black (000000) and shades of gray for titles and headings (heading 1, heading 2, etc.)
-- **Set consistent margins** (1440 = 1 inch is standard)
+**关键样式原则：**
+- **覆盖内置样式**：使用确切的 ID 如 "Heading1"、"Heading2"、"Heading3" 覆盖 Word 的内置标题样式
+- **HeadingLevel 常量**：`HeadingLevel.HEADING_1` 使用 "Heading1" 样式，`HeadingLevel.HEADING_2` 使用 "Heading2" 样式等
+- **包含 outlineLevel**：为 H1 设置 `outlineLevel: 0`，为 H2 设置 `outlineLevel: 1` 等，以确保 TOC 正常工作
+- **使用自定义样式** 而非内联格式以保持一致性
+- **使用 `styles.default.document.run.font` 设置默认字体** - 推荐 Arial
+- **建立视觉层次结构** 与不同字体大小（标题 > 副标题 > 正文）
+- **添加适当间距** 使用段落的 `before` 和 `after` 间距
+- **谨慎使用颜色**：默认使用黑色 (000000) 和不同深浅的灰色用于标题（标题 1、标题 2 等）
+- **设置一致的边距**（1440 = 1 英寸为标准）
 
 
-## Lists (ALWAYS USE PROPER LISTS - NEVER USE UNICODE BULLETS)
+## 列表（始终使用适当的列表 - 永远不要使用 Unicode 项目符号）
 ```javascript
-// Bullets - ALWAYS use the numbering config, NOT unicode symbols
-// CRITICAL: Use LevelFormat.BULLET constant, NOT the string "bullet"
+// 项目符号列表 - 始终使用编号配置，而非 unicode 符号
+// 关键：使用 LevelFormat.BULLET 常量，而非字符串 "bullet"
 const doc = new Document({
   numbering: {
     config: [
@@ -119,59 +119,59 @@ const doc = new Document({
       { reference: "first-numbered-list",
         levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT,
           style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      { reference: "second-numbered-list", // Different reference = restarts at 1
+      { reference: "second-numbered-list", // 不同引用 = 从 1 重新开始
         levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT,
           style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] }
     ]
   },
   sections: [{
     children: [
-      // Bullet list items
+      // 项目符号列表项
       new Paragraph({ numbering: { reference: "bullet-list", level: 0 },
         children: [new TextRun("First bullet point")] }),
       new Paragraph({ numbering: { reference: "bullet-list", level: 0 },
         children: [new TextRun("Second bullet point")] }),
-      // Numbered list items
+      // 编号列表项
       new Paragraph({ numbering: { reference: "first-numbered-list", level: 0 },
         children: [new TextRun("First numbered item")] }),
       new Paragraph({ numbering: { reference: "first-numbered-list", level: 0 },
         children: [new TextRun("Second numbered item")] }),
-      // ⚠️ CRITICAL: Different reference = INDEPENDENT list that restarts at 1
-      // Same reference = CONTINUES previous numbering
+      // ⚠️ 关键：不同引用 = 独立列表，从 1 重新开始
+      // 相同引用 = 继续之前的编号
       new Paragraph({ numbering: { reference: "second-numbered-list", level: 0 },
         children: [new TextRun("Starts at 1 again (because different reference)")] })
     ]
   }]
 });
 
-// ⚠️ CRITICAL NUMBERING RULE: Each reference creates an INDEPENDENT numbered list
-// - Same reference = continues numbering (1, 2, 3... then 4, 5, 6...)
-// - Different reference = restarts at 1 (1, 2, 3... then 1, 2, 3...)
-// Use unique reference names for each separate numbered section!
+// ⚠️ 关键编号规则：每个引用创建一个独立的编号列表
+// - 相同引用 = 继续编号 (1, 2, 3... 然后 4, 5, 6...)
+// - 不同引用 = 从 1 重新开始 (1, 2, 3... 然后 1, 2, 3...)
+// 为每个单独的编号部分使用唯一的引用名称！
 
-// ⚠️ CRITICAL: NEVER use unicode bullets - they create fake lists that don't work properly
-// new TextRun("• Item")           // WRONG
-// new SymbolRun({ char: "2022" }) // WRONG
-// ✅ ALWAYS use numbering config with LevelFormat.BULLET for real Word lists
+// ⚠️ 关键：永远不要使用 unicode 项目符号 - 它们会创建不能正常工作的假列表
+// new TextRun("• Item")           // 错误
+// new SymbolRun({ char: "2022" }) // 错误
+// ✅ 始终使用带有 LevelFormat.BULLET 的编号配置来创建真正的 Word 列表
 ```
 
-## Tables
+## 表格
 ```javascript
-// Complete table with margins, borders, headers, and bullet points
+// 带边距、边框、标题和项目符号的完整表格
 const tableBorder = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
 const cellBorders = { top: tableBorder, bottom: tableBorder, left: tableBorder, right: tableBorder };
 
 new Table({
-  columnWidths: [4680, 4680], // ⚠️ CRITICAL: Set column widths at table level - values in DXA (twentieths of a point)
-  margins: { top: 100, bottom: 100, left: 180, right: 180 }, // Set once for all cells
+  columnWidths: [4680, 4680], // ⚠️ 关键：在表格级别设置列宽 - 值以 DXA 为单位
+  margins: { top: 100, bottom: 100, left: 180, right: 180 }, // 为所有单元格设置一次
   rows: [
     new TableRow({
       tableHeader: true,
       children: [
         new TableCell({
           borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
-          // ⚠️ CRITICAL: Always use ShadingType.CLEAR to prevent black backgrounds in Word.
+          width: { size: 4680, type: WidthType.DXA }, // 也在每个单元格上设置宽度
+          // ⚠️ 关键：始终使用 ShadingType.CLEAR 以防止 Word 中的黑色背景。
           shading: { fill: "D5E8F0", type: ShadingType.CLEAR }, 
           verticalAlign: VerticalAlign.CENTER,
           children: [new Paragraph({ 
@@ -181,7 +181,7 @@ new Table({
         }),
         new TableCell({
           borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
+          width: { size: 4680, type: WidthType.DXA }, // 也在每个单元格上设置宽度
           shading: { fill: "D5E8F0", type: ShadingType.CLEAR },
           children: [new Paragraph({ 
             alignment: AlignmentType.CENTER,
@@ -194,12 +194,12 @@ new Table({
       children: [
         new TableCell({
           borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
+          width: { size: 4680, type: WidthType.DXA }, // 也在每个单元格上设置宽度
           children: [new Paragraph({ children: [new TextRun("Regular data")] })]
         }),
         new TableCell({
           borders: cellBorders,
-          width: { size: 4680, type: WidthType.DXA }, // ALSO set width on each cell
+          width: { size: 4680, type: WidthType.DXA }, // 也在每个单元格上设置宽度
           children: [
             new Paragraph({ 
               numbering: { reference: "bullet-list", level: 0 },
@@ -217,23 +217,23 @@ new Table({
 })
 ```
 
-**IMPORTANT: Table Width & Borders**
-- Use BOTH `columnWidths: [width1, width2, ...]` array AND `width: { size: X, type: WidthType.DXA }` on each cell
-- Values in DXA (twentieths of a point): 1440 = 1 inch, Letter usable width = 9360 DXA (with 1" margins)
-- Apply borders to individual `TableCell` elements, NOT the `Table` itself
+**重要：表格宽度 & 边框**
+- 同时使用 `columnWidths: [width1, width2, ...]` 数组和每个单元格上的 `width: { size: X, type: WidthType.DXA }`
+- 值以 DXA 为单位（点的二十分之一）：1440 = 1 英寸，Letter 可用宽度 = 9360 DXA（带 1" 边距）
+- 向各个 `TableCell` 元素应用边框，而不是 `Table` 本身
 
-**Precomputed Column Widths (Letter size with 1" margins = 9360 DXA total):**
-- **2 columns:** `columnWidths: [4680, 4680]` (equal width)
-- **3 columns:** `columnWidths: [3120, 3120, 3120]` (equal width)
+**预计算列宽（Letter 大小，1" 边距 = 9360 DXA 总计）：**
+- **2 列：** `columnWidths: [4680, 4680]`（等宽）
+- **3 列：** `columnWidths: [3120, 3120, 3120]`（等宽）
 
-## Links & Navigation
+## 链接 & 导航
 ```javascript
-// TOC (requires headings) - CRITICAL: Use HeadingLevel only, NOT custom styles
-// ❌ WRONG: new Paragraph({ heading: HeadingLevel.HEADING_1, style: "customHeader", children: [new TextRun("Title")] })
-// ✅ CORRECT: new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Title")] })
+// TOC（需要标题）- 关键：仅使用 HeadingLevel，不使用自定义样式
+// ❌ 错误：new Paragraph({ heading: HeadingLevel.HEADING_1, style: "customHeader", children: [new TextRun("Title")] })
+// ✅ 正确：new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Title")] })
 new TableOfContents("Table of Contents", { hyperlink: true, headingStyleRange: "1-3" }),
 
-// External link
+// 外部链接
 new Paragraph({
   children: [new ExternalHyperlink({
     children: [new TextRun({ text: "Google", style: "Hyperlink" })],
@@ -241,7 +241,7 @@ new Paragraph({
   })]
 }),
 
-// Internal link & bookmark
+// 内部链接 & 书签
 new Paragraph({
   children: [new InternalHyperlink({
     children: [new TextRun({ text: "Go to Section", style: "Hyperlink" })],
@@ -254,44 +254,44 @@ new Paragraph({
 }),
 ```
 
-## Images & Media
+## 图像 & 媒体
 ```javascript
-// Basic image with sizing & positioning
-// CRITICAL: Always specify 'type' parameter - it's REQUIRED for ImageRun
+// 带大小调整和定位的基本图像
+// 关键：始终指定 'type' 参数 - ImageRun 必需
 new Paragraph({
   alignment: AlignmentType.CENTER,
   children: [new ImageRun({
-    type: "png", // NEW REQUIREMENT: Must specify image type (png, jpg, jpeg, gif, bmp, svg)
+    type: "png", // 新要求：必须指定图像类型 (png, jpg, jpeg, gif, bmp, svg)
     data: fs.readFileSync("image.png"),
-    transformation: { width: 200, height: 150, rotation: 0 }, // rotation in degrees
-    altText: { title: "Logo", description: "Company logo", name: "Name" } // IMPORTANT: All three fields are required
+    transformation: { width: 200, height: 150, rotation: 0 }, // 旋转以度为单位
+    altText: { title: "Logo", description: "Company logo", name: "Name" } // 重要：所有三个字段都是必需的
   })]
 })
 ```
 
-## Page Breaks
+## 分页符
 ```javascript
-// Manual page break
+// 手动分页符
 new Paragraph({ children: [new PageBreak()] }),
 
-// Page break before paragraph
+// 段落前分页
 new Paragraph({
   pageBreakBefore: true,
   children: [new TextRun("This starts on a new page")]
 })
 
-// ⚠️ CRITICAL: NEVER use PageBreak standalone - it will create invalid XML that Word cannot open
-// ❌ WRONG: new PageBreak() 
-// ✅ CORRECT: new Paragraph({ children: [new PageBreak()] })
+// ⚠️ 关键：永远不要单独使用 PageBreak - 它会创建 Word 无法打开的无效 XML
+// ❌ 错误：new PageBreak() 
+// ✅ 正确：new Paragraph({ children: [new PageBreak()] })
 ```
 
-## Headers/Footers & Page Setup
+## 页眉/页脚 & 页面设置
 ```javascript
 const doc = new Document({
   sections: [{
     properties: {
       page: {
-        margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }, // 1440 = 1 inch
+        margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }, // 1440 = 1 英寸
         size: { orientation: PageOrientation.LANDSCAPE },
         pageNumbers: { start: 1, formatType: "decimal" } // "upperRoman", "lowerRoman", "upperLetter", "lowerLetter"
       }
@@ -313,7 +313,7 @@ const doc = new Document({
 });
 ```
 
-## Tabs
+## 制表符
 ```javascript
 new Paragraph({
   tabStops: [
@@ -325,26 +325,26 @@ new Paragraph({
 })
 ```
 
-## Constants & Quick Reference
-- **Underlines:** `SINGLE`, `DOUBLE`, `WAVY`, `DASH`
-- **Borders:** `SINGLE`, `DOUBLE`, `DASHED`, `DOTTED`  
-- **Numbering:** `DECIMAL` (1,2,3), `UPPER_ROMAN` (I,II,III), `LOWER_LETTER` (a,b,c)
-- **Tabs:** `LEFT`, `CENTER`, `RIGHT`, `DECIMAL`
-- **Symbols:** `"2022"` (•), `"00A9"` (©), `"00AE"` (®), `"2122"` (™), `"00B0"` (°), `"F070"` (✓), `"F0FC"` (✗)
+## 常量 & 快速参考
+- **下划线：** `SINGLE`, `DOUBLE`, `WAVY`, `DASH`
+- **边框：** `SINGLE`, `DOUBLE`, `DASHED`, `DOTTED`  
+- **编号：** `DECIMAL` (1,2,3), `UPPER_ROMAN` (I,II,III), `LOWER_LETTER` (a,b,c)
+- **制表符：** `LEFT`, `CENTER`, `RIGHT`, `DECIMAL`
+- **符号：** `"2022"` (•), `"00A9"` (©), `"00AE"` (®), `"2122"` (™), `"00B0"` (°), `"F070"` (✓), `"F0FC"` (✗)
 
-## Critical Issues & Common Mistakes
-- **CRITICAL: PageBreak must ALWAYS be inside a Paragraph** - standalone PageBreak creates invalid XML that Word cannot open
-- **ALWAYS use ShadingType.CLEAR for table cell shading** - Never use ShadingType.SOLID (causes black background).
-- Measurements in DXA (1440 = 1 inch) | Each table cell needs ≥1 Paragraph | TOC requires HeadingLevel styles only
-- **ALWAYS use custom styles** with Arial font for professional appearance and proper visual hierarchy
-- **ALWAYS set a default font** using `styles.default.document.run.font` - Arial recommended
-- **ALWAYS use columnWidths array for tables** + individual cell widths for compatibility
-- **NEVER use unicode symbols for bullets** - always use proper numbering configuration with `LevelFormat.BULLET` constant (NOT the string "bullet")
-- **NEVER use \n for line breaks anywhere** - always use separate Paragraph elements for each line
-- **ALWAYS use TextRun objects within Paragraph children** - never use text property directly on Paragraph
-- **CRITICAL for images**: ImageRun REQUIRES `type` parameter - always specify "png", "jpg", "jpeg", "gif", "bmp", or "svg"
-- **CRITICAL for bullets**: Must use `LevelFormat.BULLET` constant, not string "bullet", and include `text: "•"` for the bullet character
-- **CRITICAL for numbering**: Each numbering reference creates an INDEPENDENT list. Same reference = continues numbering (1,2,3 then 4,5,6). Different reference = restarts at 1 (1,2,3 then 1,2,3). Use unique reference names for each separate numbered section!
-- **CRITICAL for TOC**: When using TableOfContents, headings must use HeadingLevel ONLY - do NOT add custom styles to heading paragraphs or TOC will break
-- **Tables**: Set `columnWidths` array + individual cell widths, apply borders to cells not table
-- **Set table margins at TABLE level** for consistent cell padding (avoids repetition per cell)
+## 关键问题 & 常见错误
+- **关键：PageBreak 必须始终在 Paragraph 内部** - 单独的 PageBreak 会创建 Word 无法打开的无效 XML
+- **始终使用 ShadingType.CLEAR 进行表格单元格底纹** - 永远不要使用 ShadingType.SOLID（会导致黑色背景）。
+- 以 DXA 为单位的测量（1440 = 1 英寸）| 每个表格单元格需要 ≥1 个 Paragraph | TOC 仅需要 HeadingLevel 样式
+- **始终使用自定义样式** 并使用 Arial 字体以获得专业外观和适当的视觉层次结构
+- **始终使用 `styles.default.document.run.font` 设置默认字体** - 推荐 Arial
+- **始终为表格使用 columnWidths 数组** + 为兼容性设置单个单元格宽度
+- **永远不要使用 unicode 符号作为项目符号** - 始终使用带有 `LevelFormat.BULLET` 常量的正确编号配置（不是字符串 "bullet"）
+- **永远不要在任何地方使用 \n 作为换行符** - 始终为每行使用单独的 Paragraph 元素
+- **始终在 Paragraph children 中使用 TextRun 对象** - 永远不要在 Paragraph 上直接使用 text 属性
+- **图像的关键：** ImageRun 需要 `type` 参数 - 始终指定 "png", "jpg", "jpeg", "gif", "bmp", 或 "svg"
+- **项目符号的关键：** 必须使用 `LevelFormat.BULLET` 常量，不是字符串 "bullet"，并为项目符号字符包含 `text: "•"`
+- **编号的关键：** 每个编号引用创建一个独立的列表。相同引用 = 继续编号 (1,2,3 然后 4,5,6)。不同引用 = 从 1 重新开始 (1,2,3 然后 1,2,3)。为每个单独的编号部分使用唯一的引用名称！
+- **TOC 的关键：** 使用 TableOfContents 时，标题必须仅使用 HeadingLevel - 不要向标题段落添加自定义样式，否则 TOC 会中断
+- **表格：** 设置 `columnWidths` 数组 + 单个单元格宽度，向单元格而非表格应用边框
+- **在 TABLE 级别设置表格边距** 以获得一致的单元格填充（避免每个单元格重复）

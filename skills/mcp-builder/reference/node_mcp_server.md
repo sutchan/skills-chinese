@@ -1,14 +1,14 @@
-# Node/TypeScript MCP Server Implementation Guide
+# Node/TypeScript MCP 服务器实现指南
 
-## Overview
+## 概述
 
-This document provides Node/TypeScript-specific best practices and examples for implementing MCP servers using the MCP TypeScript SDK. It covers project structure, server setup, tool registration patterns, input validation with Zod, error handling, and complete working examples.
+本文档提供了使用 MCP TypeScript SDK 实现 MCP 服务器的 Node/TypeScript 特定最佳实践和示例。它涵盖了项目结构、服务器设置、工具注册模式、使用 Zod 进行输入验证、错误处理以及完整的工作示例。
 
 ---
 
-## Quick Reference
+## 快速参考
 
-### Key Imports
+### 关键导入
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -17,7 +17,7 @@ import express from "express";
 import { z } from "zod";
 ```
 
-### Server Initialization
+### 服务器初始化
 ```typescript
 const server = new McpServer({
   name: "service-mcp-server",
@@ -25,7 +25,7 @@ const server = new McpServer({
 });
 ```
 
-### Tool Registration Pattern
+### 工具注册模式
 ```typescript
 server.registerTool(
   "tool_name",
@@ -49,34 +49,34 @@ server.registerTool(
 
 ## MCP TypeScript SDK
 
-The official MCP TypeScript SDK provides:
-- `McpServer` class for server initialization
-- `registerTool` method for tool registration
-- Zod schema integration for runtime input validation
-- Type-safe tool handler implementations
+官方 MCP TypeScript SDK 提供：
+- `McpServer` 类用于服务器初始化
+- `registerTool` 方法用于工具注册
+- Zod 模式集成用于运行时输入验证
+- 类型安全的工具处理程序实现
 
-**IMPORTANT - Use Modern APIs Only:**
-- **DO use**: `server.registerTool()`, `server.registerResource()`, `server.registerPrompt()`
-- **DO NOT use**: Old deprecated APIs such as `server.tool()`, `server.setRequestHandler(ListToolsRequestSchema, ...)`, or manual handler registration
-- The `register*` methods provide better type safety, automatic schema handling, and are the recommended approach
+**重要 - 仅使用现代 API：**
+- **使用**：`server.registerTool()`、`server.registerResource()`、`server.registerPrompt()`
+- **不使用**：旧的已弃用 API，如 `server.tool()`、`server.setRequestHandler(ListToolsRequestSchema, ...)` 或手动处理程序注册
+- `register*` 方法提供更好的类型安全性、自动模式处理，是推荐的方法
 
-See the MCP SDK documentation in the references for complete details.
+请参阅参考中的 MCP SDK 文档以获取完整详细信息。
 
-## Server Naming Convention
+## 服务器命名约定
 
-Node/TypeScript MCP servers must follow this naming pattern:
-- **Format**: `{service}-mcp-server` (lowercase with hyphens)
-- **Examples**: `github-mcp-server`, `jira-mcp-server`, `stripe-mcp-server`
+Node/TypeScript MCP 服务器必须遵循以下命名模式：
+- **格式**：`{service}-mcp-server`（小写带连字符）
+- **示例**：`github-mcp-server`、`jira-mcp-server`、`stripe-mcp-server`
 
-The name should be:
-- General (not tied to specific features)
-- Descriptive of the service/API being integrated
-- Easy to infer from the task description
-- Without version numbers or dates
+名称应该：
+- 通用（不绑定到特定功能）
+- 描述要集成的服务/API
+- 易于从任务描述中推断
+- 不包含版本号或日期
 
-## Project Structure
+## 项目结构
 
-Create the following structure for Node/TypeScript MCP servers:
+为 Node/TypeScript MCP 服务器创建以下结构：
 
 ```
 {service}-mcp-server/
@@ -84,34 +84,34 @@ Create the following structure for Node/TypeScript MCP servers:
 ├── tsconfig.json
 ├── README.md
 ├── src/
-│   ├── index.ts          # Main entry point with McpServer initialization
-│   ├── types.ts          # TypeScript type definitions and interfaces
-│   ├── tools/            # Tool implementations (one file per domain)
-│   ├── services/         # API clients and shared utilities
-│   ├── schemas/          # Zod validation schemas
-│   └── constants.ts      # Shared constants (API_URL, CHARACTER_LIMIT, etc.)
-└── dist/                 # Built JavaScript files (entry point: dist/index.js)
+│   ├── index.ts          # 带 McpServer 初始化的主入口点
+│   ├── types.ts          # TypeScript 类型定义和接口
+│   ├── tools/            # 工具实现（每个域一个文件）
+│   ├── services/         # API 客户端和共享实用程序
+│   ├── schemas/          # Zod 验证模式
+│   └── constants.ts      # 共享常量（API_URL、CHARACTER_LIMIT 等）
+└── dist/                 # 构建的 JavaScript 文件（入口点：dist/index.js）
 ```
 
-## Tool Implementation
+## 工具实现
 
-### Tool Naming
+### 工具命名
 
-Use snake_case for tool names (e.g., "search_users", "create_project", "get_channel_info") with clear, action-oriented names.
+使用 snake_case 作为工具名称（例如，"search_users"、"create_project"、"get_channel_info"），使用清晰、面向动作的名称。
 
-**Avoid Naming Conflicts**: Include the service context to prevent overlaps:
-- Use "slack_send_message" instead of just "send_message"
-- Use "github_create_issue" instead of just "create_issue"
-- Use "asana_list_tasks" instead of just "list_tasks"
+**避免命名冲突**：包含服务上下文以防止重叠：
+- 使用 "slack_send_message" 而不仅仅是 "send_message"
+- 使用 "github_create_issue" 而不仅仅是 "create_issue"
+- 使用 "asana_list_tasks" 而不仅仅是 "list_tasks"
 
-### Tool Structure
+### 工具结构
 
-Tools are registered using the `registerTool` method with the following requirements:
-- Use Zod schemas for runtime input validation and type safety
-- The `description` field must be explicitly provided - JSDoc comments are NOT automatically extracted
-- Explicitly provide `title`, `description`, `inputSchema`, and `annotations`
-- The `inputSchema` must be a Zod schema object (not a JSON schema)
-- Type all parameters and return values explicitly
+工具使用 `registerTool` 方法注册，要求如下：
+- 使用 Zod 模式进行运行时输入验证和类型安全
+- 必须明确提供 `description` 字段 - 不会自动提取 JSDoc 注释
+- 明确提供 `title`、`description`、`inputSchema` 和 `annotations`
+- `inputSchema` 必须是 Zod 模式对象（不是 JSON 模式）
+- 明确键入所有参数和返回值
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -776,7 +776,7 @@ server.registerResource(
   },
   async (uri: string) => {
     // Extract parameter from URI
-    const match = uri.match(/^file:\/\/documents\/(.+)$/);
+    const match = uri.match(/^file:\/\/documents\/(.*)$/);
     if (!match) {
       throw new Error("Invalid URI format");
     }
