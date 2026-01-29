@@ -1,7 +1,7 @@
 ---
 name: skill-creator
 description: 用于创建有效技能的指南。当用户想要创建新技能（或更新现有技能）以通过专业知识、工作流程或工具集成扩展 Claude 的能力时，应使用此技能。
-license: Complete terms in LICENSE.txt
+license: 完整条款见 LICENSE.txt
 ---
 
 # 技能创建器
